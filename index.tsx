@@ -5,7 +5,7 @@ import { GoogleGenAI, Type, Modality } from "@google/genai";
 
 // --- Configuration ---
 
-const SYSTEM_VOICE = 'Kore'; // 'Fenrir' or 'Kore' sound great for immersive French storytelling
+const SYSTEM_VOICE = 'Kore'; // 'Kore' (warm, expressive) or 'Fenrir' (deep, authoritative) for French storytelling
 const SAMPLE_RATE = 24000;
 
 // --- Interfaces ---
@@ -61,21 +61,21 @@ const AgentService = {
    */
   async createRunOfShow(topic: string): Promise<BroadcastPlan> {
     const prompt = `
-      Rôle : Architecte de Récits et Conteur Maître.
-      Tâche : Créer la structure narrative complète pour raconter une histoire fascinante et immersive sur : "${topic}".
+      Rôle : Architecte de Récits - Conteur Maître.
+      Tâche : Créer la structure narrative pour une histoire captivante sur : "${topic}".
       
-      Objectif : Construire un récit profond, captivant et riche en détails. L'histoire doit se dérouler comme une épopée, avec des rebondissements, des moments de tension, et des révélations progressives.
+      Objectif : Une épopée profonde avec rebondissements, tension, et révélations progressives.
       
       Instructions :
-      1. Découpe l'histoire en 6 à 8 "Actes narratifs" distincts et progressifs qui suivent une vraie structure de conte (ex: Le Commencement, L'Appel de l'Aventure, Les Premières Épreuves, Le Point de Non-Retour, Les Révélations, L'Apogée, Les Conséquences, L'Héritage).
-      2. Chaque acte doit révéler une nouvelle dimension de l'histoire, comme des chapitres d'un grand roman.
-      3. Choisis un "Récit Connexe" pour continuer l'aventure après (ex: si l'histoire est "Napoléon", le prochain récit pourrait être "Alexandre le Grand : Le Premier Conquérant").
+      1. Découpe en 6-8 "Actes narratifs" suivant une structure de conte (Le Commencement, L'Appel de l'Aventure, Les Épreuves, Le Point de Non-Retour, Les Révélations, L'Apogée, L'Héritage).
+      2. Chaque acte révèle une nouvelle dimension de l'histoire.
+      3. Choisis un "Récit Connexe" pour continuer après (ex: Napoléon → Alexandre le Grand).
       
-      Format JSON attendu :
+      Format JSON :
       {
         "mainTopic": "${topic}",
-        "chapters": ["Acte 1: Titre évocateur", "Acte 2: Titre évocateur", ...],
-        "nextPivotTopic": "La prochaine grande histoire à raconter"
+        "chapters": ["Acte 1: Titre évocateur", ...],
+        "nextPivotTopic": "La prochaine histoire"
       }
     `;
 
@@ -106,13 +106,10 @@ const AgentService = {
    */
   async researchChapter(chapter: string, mainTopic: string): Promise<string> {
     const prompt = `
-      Histoire Principale : ${mainTopic}
-      Acte Narratif : ${chapter}
+      Histoire : ${mainTopic}
+      Acte : ${chapter}
       
-      Tâche : Découvre 3 ou 4 éléments narratifs puissants, dramatiques et peu connus pour cet acte de l'histoire.
-      Recherche des détails humains, des moments de tension, des révélations surprenantes, des tournants décisifs.
-      Trouve des anecdotes émotionnelles, des dialogues mémorables, des scènes visuelles fortes.
-      Cherche ce qui rend cette partie de l'histoire vivante et captivante.
+      Trouve 3-4 éléments narratifs puissants et dramatiques : détails humains, moments de tension, révélations surprenantes, tournants décisifs, anecdotes émotionnelles, dialogues mémorables, scènes visuelles fortes.
     `;
 
     // Note: Using search requires flash-preview or pro models with tool config
@@ -138,27 +135,25 @@ const AgentService = {
     context: string
   ): Promise<BroadcastSegment> {
     const prompt = `
-      Tu es un conteur magistral qui tisse des récits captivants et immersifs.
+      Tu es un conteur magistral. Tisse un récit captivant et immersif.
       Langue : Français.
       
-      Contexte narratif : ${context}
-      Acte actuel de l'histoire : ${chapter}
-      Éléments narratifs découverts : ${researchNotes}
+      Contexte : ${context}
+      Acte : ${chapter}
+      Éléments : ${researchNotes}
 
-      Directives pour le récit :
-      1. Rédige un passage narratif de 50 à 70 secondes qui raconte vraiment une histoire.
-      2. Ton : Immersif, évocateur, cinématographique. Comme si tu racontais une légende au coin du feu.
-      3. Utilise des descriptions vivantes, des détails sensoriels, des moments de tension dramatique.
-      4. Fais vivre les personnages et les scènes. Utilise le présent de narration pour rendre l'histoire immédiate.
-      5. Crée des images mentales puissantes. Le lecteur doit VOIR et RESSENTIR ce que tu racontes.
-      6. Utilise les éléments de recherche pour ancrer l'histoire dans la réalité, mais raconte-la comme un grand roman.
-      7. Transitions fluides et organiques. Chaque passage est un chapitre d'une épopée infinie.
-      8. Ne dis jamais "Bonjour", "Au revoir" ou "Bienvenue". Tu es en plein cœur de l'histoire.
+      Directives (50-70s) :
+      1. Ton immersif, évocateur, cinématographique - comme raconter une légende au coin du feu.
+      2. Descriptions vivantes, détails sensoriels, tension dramatique.
+      3. Fais vivre personnages et scènes. Présent de narration pour l'immédiateté.
+      4. Crée des images mentales puissantes. Le lecteur doit VOIR et RESSENTIR.
+      5. Utilise les éléments de recherche mais raconte comme un grand roman.
+      6. Transitions fluides. Pas de "Bonjour", "Au revoir" - tu es au cœur de l'histoire.
 
       Output JSON :
       {
         "script": "Le texte narratif captivant...",
-        "displayTitle": "Titre évocateur de l'acte (3-6 mots)"
+        "displayTitle": "Titre évocateur (3-6 mots)"
       }
     `;
 
